@@ -1,0 +1,12 @@
+/* Ensure the image is responsive */
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 15px; /* Add space between the image and navbar */
+}
+
+/* Optional: You can also style the navbar if needed */
+.navbar {
+  position: relative;
+  bottom: 0; /* Adjust if necessary */
+}

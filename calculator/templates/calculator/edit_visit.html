@@ -1,0 +1,91 @@
+{% extends 'base.html' %} {% block title %} Edit {% endblock %}
+<p>{% block content %}</p>
+<div class="mt-5 py-4">
+    <div class="card shadow-lg border-0">
+      <div class="card-header bg-info text-white text-center">
+        <h2>Record Supplement Intake for {{ checkup.patient_name }}</h2>
+      </div>
+      <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Visit Week -->
+            <!-- Visit Week -->
+            <div class="form-group">
+              <label for="visit_week"><strong>Visit Week</strong></label>
+              <select id="visit_week" name="visit_week" class="form-control" required>
+                  <option value="" disabled {% if next_visit_week is none %}selected{% endif %}>Select a Week</option>
+                  <option value="First" {% if next_visit_week == 'First' %}selected{% endif %}>First Time </option>
+                  <option value="12" {% if next_visit_week == 12 %}selected{% endif %}>Week 12</option>
+                  <option value="16" {% if next_visit_week == 16 %}selected{% endif %}>Week 16</option>
+                  <option value="20" {% if next_visit_week == 20 %}selected{% endif %}>Week 20</option>
+                  <option value="24" {% if next_visit_week == 24 %}selected{% endif %}>Week 24</option>
+                  <option value="28" {% if next_visit_week == 28 %}selected{% endif %}>Week 28</option>
+                  <option value="32" {% if next_visit_week == 32 %}selected{% endif %}>Week 32</option>
+                  <option value="34" {% if next_visit_week == 34 %}selected{% endif %}>Week 34</option>
+                  <option value="36" {% if next_visit_week == 36 %}selected{% endif %}>Week 36</option>
+                  <option value="38" {% if next_visit_week == 38 %}selected{% endif %}>Week 38</option>
+                  <option value="40" {% if next_visit_week == 40 %}selected{% endif %}>Week 40</option>
+              </select>
+            </div>
+              <!-- Today's Visit Date (BS) -->
+            <div class="form-group">
+              <label for="visit_date_bs"><strong>Today's Visit Date (BS)</strong></label>
+              <input type="text" id="visit_date_bs" name="visit_date_bs" class="form-control" value="" placeholder="YYYY-MM-DD" required />
+            </div>
+  
+            <!-- Next Visit Date (BS) -->
+            <div class="row"> 
+              <div class="form-group">
+                <label for="next_visit_date"><strong>Next Visit Date (BS)</strong></label>
+                <input type="text" id="next_visit_date" name="next_visit_date" class="form-control" value="" placeholder="YYYY-MM-DD" required />
+              </div>
+          
+  
+            </div>
+            <div class="form-group">
+              <label for="iron_intake"><strong>Iron Intake (Tab)</strong></label>
+              <input type="number" id="iron_intake" name="iron_intake" class="form-control" value="" min="0" step="1" required
+              />
+            </div>
+      
+            <!-- Calcium Intake -->
+            <div class="form-group">
+              <label for="calcium_intake"><strong>Calcium Intake (Tab)</strong></label>
+              <input type="number" id="calcium_intake" name="calcium_intake" class="form-control" value="" min="0" step="1" required
+              />
+            </div>
+              <div id="folic_acid_group" class="form-group">
+                <label for="folic_acid"><strong>Folic Acid Given?</strong></label>
+                <select id="folic_acid" name="folic_acid" class="form-control">
+                    <option value="">Select...</option>
+                    <option value="yes" {% if visit.folic_acid == 'yes' %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if visit.folic_acid == 'no' %}selected{% endif %}>No</option>
+                </select>
+              </div>
+        
+            <!-- Td Injection Given Question -->
+            <div id="dt_injection_group" class="form-group">
+                <label for="dt_injection"><strong>Td Injection Given?</strong></label>
+                <select id="dt_injection" name="dt_injection" class="form-control">
+                    <option value="">Select...</option>
+                    <option value="yes" {% if visit.dt_injection == 'yes' %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if visit.dt_injection == 'no' %}selected{% endif %}>No</option>
+                </select>
+            </div>
+        
+            <!-- Albendazole Given Question -->
+            <div class="form-group">
+              <label for="intestinal_parasites_medicine"><strong>Albendazole (400mg) Given?</strong></label>
+              <select id="intestinal_parasites_medicine" name="intestinal_parasites_medicine" class="form-control">
+                  <option value="">Select...</option>
+                  <option value="yes" {% if visit.intestinal_parasites_medicine == 'yes' %}selected{% endif %}>Yes</option>
+                  <option value="no" {% if visit.intestinal_parasites_medicine == 'no' %}selected{% endif %}>No</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form> 
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}

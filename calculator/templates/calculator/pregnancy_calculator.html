@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5">
+  <h2 class="text-center">Pregnancy Date Calculator</h2>
+
+  <!-- Form for user input -->
+  <div class="card shadow-sm mt-4">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Today's Nepali Date:</label>
+          <p>{{ today_nepali }} ({{ today_weekday }})</p>
+        </div>
+        <div class="form-group">
+          <label for="id_last_menstrual_period_bs">Enter LMP (BS):</label>
+          {{ form.last_menstrual_period_bs }}
+        </div>
+        <button type="submit" class="btn btn-success btn-lg mt-4">
+          Calculate
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  {% if gestational_age %}
+  <div class="mt-6 p-4 bg-light border border-primary rounded-md mt-5">
+    <h3>Calculated Pregnancy Details</h3>
+    <div class="mb-2"><strong>LMP (BS):</strong> {{ lmp_bs }}</div>
+    <div class="mb-2"><strong>EDD (BS):</strong> {{ due_date_bs }}</div>
+    <div class="mb-2"><strong>EDD (AD):</strong> {{ due_date }}</div>
+    <div><strong>Gestational Age:</strong> {{ gestational_age }}</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

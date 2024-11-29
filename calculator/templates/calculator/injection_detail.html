@@ -1,0 +1,30 @@
+{% extends 'base.html' %}{% block content %}
+<title>Checkup-Details</title>
+<form method="POST">
+  {% csrf_token %}
+
+  <!-- Injection details -->
+  <div class="form-group">
+    <label for="injection_type">Injection Type</label>
+    <input
+      type="text"
+      class="form-control"
+      id="injection_type"
+      name="injection_type"
+    />
+  </div>
+
+  <!-- Intestinal Parasite details -->
+  <div class="form-group">
+    <label for="intestinal_parasite_type">Intestinal Parasite Type</label>
+    <input
+      type="text"
+      class="form-control"
+      id="intestinal_parasite_type"
+      name="intestinal_parasite_type"
+    />
+  </div>
+
+  <button type="submit" class="btn btn-primary">Record Visit</button>
+</form>
+{% endblock %}

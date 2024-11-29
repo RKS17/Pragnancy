@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Pregnancy Checkup{% endblock %}</title>
+
+    <!-- FontAwesome Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+    <style>
+      /* Hide the toggle button on mobile devices */
+      .navbar-toggler {
+        display: none !important;
+      }
+      .full-image-container {
+        background-image: url("{% static 'images/bg.webp' %}");
+        background-size: cover; /* Fills the container, may crop */
+        background-position: center;
+        height: 100vh; /* Full viewport height */
+        width: 100%;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2; /* Ensures content is above the background */
+      }
+    </style>
+  </head>
+  <div class="full-image-container">
+    <div class="content">
+      <body class="bg-light-pink">
+        <!-- Navbar Section -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+          <!-- Brand (Logo and Name) -->
+          <a class="navbar-brand font-weight-bold" href="{% url 'home' %}">
+            <i class="fas fa-home mr-2"></i> Pregnancy Care
+          </a>
+
+          <!-- Navbar Items -->
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'english_date' %}">
+                  <i class="fas fa-calculator"></i> Calculator (AD)
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'nepali_date' %}">
+                  <i class="fas fa-calendar-alt"></i> Calculator (BS)
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'add_pregnancy_checkup' %}">
+                  <i class="fas fa-pen"></i> Register
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'checkup_list' %}">
+                  <i class="fas fa-list"></i> Patient List
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Profile Section (Always Visible) -->
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link d-flex align-items-center"
+                href="{% url 'profile' %}"
+                style="gap: 10px"
+              >
+                <img
+                  src="{% if user.userprofile.profile_image %}{{ user.userprofile.profile_image.url }}{% else %}{% static 'images/default.png' %}{% endif %}"
+                  alt="{{ user.userprofile.full_name }}'s Profile Picture"
+                  class="rounded-circle"
+                  style="width: 35px; height: 35px; object-fit: cover"
+                />
+                <span class="d-none d-md-inline" style="font-size: 1rem"
+                  >{{ user.userprofile.full_name }}</span
+                >
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Main Content Section -->
+        <div class="mt-5">{% block content %} {% endblock %}</div>
+
+        <!-- jQuery and Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      </body>
+    </div>
+  </div>
+</html>

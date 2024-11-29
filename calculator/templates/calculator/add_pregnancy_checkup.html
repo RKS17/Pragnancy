@@ -1,0 +1,113 @@
+{% extends 'base.html' %} {% load widget_tweaks %} {% block content %}
+<title>ADD Patient</title>
+<style>
+  /* Add this in your styles.css */
+  body {
+    background-color: #f7f9fc;
+  }
+
+  .container {
+    max-width: 800px;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .card-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  form label {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  form .form-control {
+    border-radius: 5px;
+  }
+
+  button.btn-success {
+    padding: 10px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease-in-out;
+  }
+
+  button.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+  }
+</style>
+<div class="mt-5">
+  <div class="card shadow-lg border-0 rounded-lg">
+    <!-- Card Header with Title -->
+    <div class="card-header text-center bg-primary text-white">
+      <h2><strong>बिरामीको नाम दर्ता</strong></h2>
+    </div>
+
+    <!-- Card Body with Form -->
+    <div class="card shadow-sm mt-4">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-row">
+            <!-- Patient Name Field -->
+            <div class="form-group col-md-6">
+              <label for="patientName" class="font-weight-bold">
+                {{ form.patient_name.label }}
+              </label>
+              {{ form.patient_name|add_class:"form-control" }}
+            </div>
+
+            <!-- Husband Name Field -->
+            <div class="form-group col-md-6">
+              <label for="husbandName" class="font-weight-bold">
+                {{ form.husband_name.label }}
+              </label>
+              {{ form.husband_name|add_class:"form-control" }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Contact Number Field -->
+            <div class="form-group col-md-6">
+              <label for="contactNumber" class="font-weight-bold">
+                {{ form.contact_number.label }}
+              </label>
+              {{ form.contact_number|add_class:"form-control" }}
+            </div>
+
+            <!-- Last Menstrual Period (BS) Field -->
+            <div class="form-group col-md-6">
+              <label for="lmpBS" class="font-weight-bold">
+                {{ form.last_menstrual_period_bs.label }}
+              </label>
+              {{ form.last_menstrual_period_bs|add_class:"form-control" }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Profile Image Upload Field (Optional) -->
+            <div class="form-group col-md-6">
+              <label for="profileImage" class="font-weight-bold">
+                {{ form.profile_image.label }}
+              </label>
+              {{ form.profile_image|add_class:"form-control-file" }}
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg mt-4">
+              <i class="fas fa-save"></i> Create
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>

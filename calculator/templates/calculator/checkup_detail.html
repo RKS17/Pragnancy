@@ -1,0 +1,285 @@
+{% extends 'base.html' %} {% block content %}
+
+<title>Checkup-Details</title>
+<div class=" mt-5">
+  <!-- Page Title -->
+  {% if messages %}
+  <div class="alert alert-success">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Patient Information Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-header text-center bg-primary text-white">
+        <p><strong>महिलाको जानकारी</strong></p>
+      </h4>
+      <hr />
+      <p style="color: green; background-color: #e8f5e9;"><strong>महिलाको नाम:</strong> {{ checkup.patient_name|upper }}</p>
+      <p style="color: green; background-color: #e8f5e9;"><strong>पतिको नाम:</strong> {{ checkup.husband_name|upper }}</p>
+      <p style="color: green; background-color: #e8f5e9;"><strong>संपर्क नम्बर:</strong> {{ checkup.contact_number }}</p>
+
+
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="row mb-5">
+        <!-- First Column (Left: LMP) -->
+        <div class="col-6 col-md-6 mb-4 mb-md-0">
+          <div class="row">
+            <div class="col-12 mb-3">
+              <button class="btn btn-success w-100">LMP (BS)</button>
+              <p class="text-center bg-pink w-100 p-2">
+                {{ checkup.last_menstrual_period_bs }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second Column (Right: Gestational Age and EDD) -->
+        <div class="col-6 col-md-6 mb-4 mb-md-0">
+          <div class="row">
+            <!-- POG (Gestational Age) -->
+            <div class="col-12 mb-3">
+              <button class="btn btn-success w-100">POG</button>
+              <p class="text-center bg-pink w-100 p-2">
+                {% if gestational_age %} {{ gestational_age }} {% else %} N/A 
+                <p>{%endif %}</p>
+              </p>
+            </div>
+
+            <!-- EDD (Estimated Due Date) -->
+            <div class="col-12">
+              <button class="btn btn-success w-100">EDD (BS)</button>
+              <p class="text-center bg-pink w-100 p-2">
+                {{ checkup.estimated_due_date_bs }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .bg-pink {
+      background-color: #f8d7da; /* Mild pink background */
+      border-radius: 4px;
+      padding: 10px;
+    }
+  </style>
+
+  <div class="container mt-5">
+    <!-- Header Section -->
+
+    <!-- Form for user input -->
+    <div class="card shadow-sm mt-4">
+      <div class="card-body">
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+
+          <!-- Input Section -->
+          <div class="form-group">
+            {% comment %} <strong>Today's Date:</strong> {{ today_nepali }}
+            <p>{{ today_weekday }}</p>
+            <label for="contactNumber">Enter the Nepali Date:</label>
+            {% endcomment %} {{ form.as_p }}
+          </div>
+
+          <!-- Calculate Button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg mt-4">
+              Calculate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkup Schedule Section -->
+  <h1 class="text-center mb-5"><strong>गर्भवती जाँच विवरण</strong></h1>
+  <div class="col-6 col-md-6 mb-4 mb-md-0">
+    <div class="row">
+      <div class="col-12 mb-3">
+        <button class="btn btn-success w-100">Any Time:</button>
+        <p class=" text-center bg-pink w-100 p-2">
+          {{ checkup.arrival_date }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-bordered mb-5">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col" class="text-center">गर्भवती जाँच</th>
+        <th scope="col" class="text-center">जाँच मिति (BS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in checkup.checkup_dates_bs %}
+      <tr>
+        <td class="text-center"><strong>{{ item.week_range }}</strong></td>
+        <td class="text-center">
+          {% if item.date %} {{ item.date }} {% else %} {{ item.date_range }}
+          <p>{% endif %}</p>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Back Button -->
+<div class="text-center bg-green">
+  <a href="{% url 'record_visit' checkup.id %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i>Record Visit
+  </a>
+  <a href="{% url 'checkup_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i>List Visit
+  </a>
+</div>
+
+<h1 class="text-center mt-4" style="font-size: 2rem">
+  <strong>Supplement Intake Records</strong>
+</h1>
+<h3>Patient: <strong>{{ checkup.patient_name|upper }}</strong></h3>
+
+<table class="table table-bordered mt-4">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">गर्भवती जाँच</th>
+      <th scope="col">जाँच मिति (BS)</th>
+      <th scope="col">आयरन सेवन (mg)</th>
+      <th scope="col">क्याल्सियम सेवन (mg)</th>
+      <th scope="col">Folic Acid</th>
+      <th scope="col">Td Injection</th>
+      <th scope="col">Albendazole</th>
+      <th scope="col">Actions</th>
+      <!-- Added column for actions -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for visit in checkup.visits.all %}
+    <tr>
+      <td><strong>Week {{ visit.visit_week }}</strong></td>
+      <td>{{ visit.visit_date_bs|default:"N/A" }}</td>
+      <td>{{ visit.iron_intake }} mg</td>
+      <td>{{ visit.calcium_intake }} mg</td>
+
+
+      <!-- Folic Acid with color classes -->
+      <td
+        class="text-center"
+        data-folic-acid="{{ visit.folic_acid|yesno:'yes,no' }}"
+      >
+        <span> {{ visit.folic_acid|yesno:"Yes,No" }} </span>
+      </td>
+
+      <!-- Td Injection with color classes -->
+      <td
+        class="text-center"
+        data-injection="{{ visit.dt_injection|yesno:'yes,no' }}"
+      >
+        <span> {{ visit.dt_injection|yesno:"Yes,No" }} </span>
+      </td>
+
+      <!-- Albendazole with color classes -->
+      <td
+        class="text-center"
+        data-medicine="{{ visit.intestinal_parasites_medicine|yesno:'yes,no' }}"
+      >
+        <span> {{ visit.intestinal_parasites_medicine|yesno:"Yes,No" }} </span>
+      </td>
+
+      <!-- Edit Button -->
+      <td class="text-center">
+        <a href="{% url 'edit_visit' visit.id %}" class="btn btn-warning btn-sm"
+          ><i class="fas fa-edit"></i>Edit</a
+        >
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="8" class="text-center">No visits recorded yet</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+  <tfoot>
+    <tr>
+      <th colspan="2" class="text-right">कुल</th>
+      <th>{{ checkup.total_iron_intake }} mg</th>
+      <th>{{ checkup.total_calcium_intake }} mg</th>
+      <!-- Empty cell for alignment in the footer -->
+    </tr>
+  </tfoot>
+</table>
+<script>
+  // Convert AD to BS (Nepali Date) - Placeholder function
+  function convertADtoBS(adDate) {
+    const monthsNepali = [
+      "बैशाख",
+      "जेष्ठ",
+      "आषाढ़",
+      "श्रावण",
+      "भाद्रपद",
+      "आश्विन",
+      "कात्तिक",
+      "मङ्सिर",
+      "पुष",
+      "माघ",
+      "फागुन",
+      "चैत",
+    ];
+    const date = new Date(adDate);
+    const nepaliMonth = monthsNepali[date.getMonth()];
+    const nepaliYear = date.getFullYear() + 57;
+    return `${nepaliYear} ${nepaliMonth} ${date.getDate()}`;
+  }
+
+  // Get today's date and display it in BS format
+  const today = new Date();
+  const nepaliDate = convertADtoBS(today);
+  document.getElementById(
+    "nepali-date"
+  ).innerText = `Today's Nepali Date: ${nepaliDate}`;
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Apply background color based on the value
+    const injectionCells = document.querySelectorAll("td[data-injection]");
+    injectionCells.forEach((cell) => {
+      if (cell.dataset.injection === "yes") {
+        cell.classList.add("bg-success", "text-white");
+      } else {
+        cell.classList.add("bg-danger", "text-white");
+      }
+    });
+
+    const medicineCells = document.querySelectorAll("td[data-medicine]");
+    medicineCells.forEach((cell) => {
+      if (cell.dataset.medicine === "yes") {
+        cell.classList.add("bg-success", "text-white");
+      } else {
+        cell.classList.add("bg-danger", "text-white");
+      }
+    });
+
+    const folicAcidCells = document.querySelectorAll("td[data-folic-acid]");
+    folicAcidCells.forEach((cell) => {
+      if (cell.dataset.folicAcid === "yes") {
+        cell.classList.add("bg-success", "text-white");
+      } else {
+        cell.classList.add("bg-danger", "text-white");
+      }
+    });
+  });
+</script>
+
+{% endblock %}

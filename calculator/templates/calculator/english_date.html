@@ -1,0 +1,246 @@
+{% extends 'base.html' %} {% block title %} AD Date {% endblock %}
+<p>{% block content %}</p>
+
+<title>English</title>
+<div class="card-header text-center bg-primary text-white">
+  <h2><strong>Pregnancy Date Calculator</strong></h2>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="text-center">
+    <!-- Today's Date Section -->
+    <div class="mb-4">
+      <label
+        for="todays-date"
+        class="block text-sm font-semibold text-gray-700"
+      >
+        <strong> Today's Date</strong></label
+      >
+      <div class="grid grid-cols-3 gap-2 mt-2">
+        <select id="today-month" class="border border-gray-300 rounded-md p-2">
+          <!-- Month Options will be populated via JS -->
+        </select>
+        <select id="today-day" class="border border-gray-300 rounded-md p-2">
+          <!-- Day Options will be populated via JS -->
+        </select>
+        <select id="today-year" class="border border-gray-300 rounded-md p-2">
+          <!-- Year Options will be populated via JS -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Last Period Date Section -->
+    <div class="mb-4">
+      <label for="last-period" class="block text-sm font-semibold text-gray-700"
+        ><strong>First Day of Last Period</strong></label
+      >
+      <div class="grid grid-cols-3 gap-2 mt-2">
+        <select id="last-month" class="border border-gray-300 rounded-md p-2">
+          <!-- Month Options for Last Period -->
+        </select>
+        <select id="last-day" class="border border-gray-300 rounded-md p-2">
+          <!-- Day Options for Last Period -->
+        </select>
+        <select id="last-year" class="border border-gray-300 rounded-md p-2">
+          <!-- Year Options for Last Period -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Calculate Button -->
+    <div class="text-center">
+      <button id="calculate-button" class="btn btn-success btn-lg mt-4">
+        Calculate
+      </button>
+    </div>
+
+    <!-- Result Section -->
+    <div class="text-center">
+      <div
+        id="result-section"
+        class="bg-gray-50 p-4 border border-primary rounded-md mt-6 hidden"
+      >
+        <h3 class="text-lg font-semibold text-primary mb-2">Results</h3>
+        <div class="mb-2">
+          <span class="font-medium text-gray-700"
+            >Estimated Due Date (EDD):</span
+          >
+          <input
+            type="text"
+            id="edd-result"
+            class="w-full mt-1 border border-gray-300 rounded-md p-2"
+            readonly
+          />
+        </div>
+        <div class="mb-2">
+          <span class="font-medium text-gray-700">Gestational Age:</span>
+          <input
+            type="text"
+            id="gestational-age-result"
+            class="w-full mt-1 border border-gray-300 rounded-md p-2"
+            readonly
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset Button (Initially hidden) -->
+    <div class="text-center">
+      <button id="reset-button" class="btn btn-success btn-lg mt-4">
+        Reset Form
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set today's date automatically
+  document.addEventListener("DOMContentLoaded", function () {
+    const today = new Date();
+    const month = today.getMonth(); // Get current month index (0 to 11)
+    const day = today.getDate();
+    const year = today.getFullYear();
+
+    // Month names array (short version)
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Populate today's month dropdown with short month names
+    document.getElementById("today-month").innerHTML = generateMonthOptions(
+      monthNames,
+      month
+    );
+    document.getElementById("last-month").innerHTML = generateMonthOptions(
+      monthNames,
+      month
+    );
+
+    // Populate day and year dropdowns
+    document.getElementById("today-day").innerHTML = generateOptions(
+      1,
+      31,
+      day
+    );
+    document.getElementById("today-year").innerHTML = generateOptions(
+      1900,
+      year,
+      year
+    );
+    document.getElementById("last-day").innerHTML = generateOptions(1, 31, day);
+    document.getElementById("last-year").innerHTML = generateOptions(
+      1900,
+      year,
+      year
+    );
+  });
+
+  // Function to generate month options with short names
+  function generateMonthOptions(monthNames, selected) {
+    let options = "";
+    for (let i = 0; i < monthNames.length; i++) {
+      options += `<option value="${i + 1}" ${
+        i === selected ? "selected" : ""
+      }>${monthNames[i]}</option>`;
+    }
+    return options;
+  }
+
+  // Function to generate day options
+  function generateOptions(start, end, selected) {
+    let options = "";
+    for (let i = start; i <= end; i++) {
+      options += `<option value="${i}" ${
+        i === selected ? "selected" : ""
+      }>${i}</option>`;
+    }
+    return options;
+  }
+
+  // Calculate pregnancy details based on LMP date
+  document
+    .getElementById("calculate-button")
+    .addEventListener("click", calculatePregnancy);
+
+  function calculatePregnancy() {
+    // Get values from form inputs
+    const lastPeriodMonth = document.getElementById("last-month").value;
+    const lastPeriodDay = document.getElementById("last-day").value;
+    const lastPeriodYear = document.getElementById("last-year").value;
+
+    if (lastPeriodMonth && lastPeriodDay && lastPeriodYear) {
+      const lmpDate = new Date(
+        lastPeriodYear,
+        lastPeriodMonth - 1,
+        lastPeriodDay
+      ); // JavaScript months are 0-based
+
+      const eddDate = new Date(lmpDate);
+      eddDate.setDate(eddDate.getDate() + 280); // 280 days for pregnancy
+
+      const today = new Date();
+      const weeksPregnant = Math.floor(
+        (today - lmpDate) / (1000 * 60 * 60 * 24 * 7)
+      );
+
+      // Output results to the user
+      document.getElementById("edd-result").value =
+        formatDateWithMonthName(eddDate);
+      document.getElementById("gestational-age-result").value =
+        weeksPregnant + " weeks";
+
+      document.getElementById("result-section").classList.remove("hidden");
+      document.getElementById("reset-button").classList.remove("hidden"); // Show reset button
+    } else {
+      alert("Please fill in all fields.");
+    }
+  }
+
+  // Helper function to format date as YYYY-MM-DD with month name
+  function formatDateWithMonthName(date) {
+    const yyyy = date.getFullYear();
+    const mm = date.getMonth(); // Get month index (0 to 11)
+    const dd = String(date.getDate()).padStart(2, "0");
+
+    // Month names array
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return `${monthNames[mm]} ${dd}, ${yyyy}`;
+  }
+
+  // Reset button functionality
+  document
+    .getElementById("reset-button")
+    .addEventListener("click", function () {
+      document.getElementById("edd-result").value = "";
+      document.getElementById("gestational-age-result").value = "";
+      document.getElementById("result-section").classList.add("hidden");
+      document.getElementById("reset-button").classList.add("hidden"); // Hide reset button
+    });
+</script>
+
+{% endblock %}

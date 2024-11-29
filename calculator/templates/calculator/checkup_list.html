@@ -1,0 +1,105 @@
+{% extends 'base.html' %} {% block content %}
+
+<title>Checkup-List</title>
+<div class="card-header text-center bg-primary text-white">
+  <h2><strong>गर्भवती महिलाको विवरण</strong></h2>
+</div>
+
+<!-- Table for Pregnancy Checkup Details -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-striped table-hover align-middle">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th scope="col">महिलाको नाम</th>
+        <th scope="col">पतिको नाम</th>
+        <th scope="col">सम्पर्क नम्बर</th>
+        <th scope="col">प्रवेश मिति</th>
+        <th scope="col">विवरण हेर्नुहोस्</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for checkup in checkups %} {% if checkup.user == request.user %}
+      <tr>
+        <td>{{ checkup.id }}</td>
+        <td>
+          <a href="{% url 'checkup_detail' patient_id=checkup.id %}">
+            {{ checkup.patient_name|upper }}
+          </a>
+        </td>
+        <td>{{ checkup.husband_name|upper }}</td>
+        <td>{{ checkup.contact_number }}</td>
+        <td>
+          {% if checkup.arrival_date %} {{ checkup.arrival_date }} {% else %}
+          N/A {% endif %}
+        </td>
+
+        <td>
+          <a
+            href="{% url 'checkup_detail' patient_id=checkup.id %}"
+            class="btn btn-primary btn-sm"
+            >View</a
+          >
+          <a
+            href="{% url 'record_visit' checkup.id %}"
+            class="btn btn-success btn-sm"
+            >Record</a
+          >
+          <form
+            action="{% url 'delete_checkup' checkup.id %}"
+            method="post"
+            style="display: inline"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn btn-danger btn-sm"
+              onclick="return confirm('Are you sure you want to delete this record?');"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endif %} {% empty %}
+      <tr>
+        <td colspan="7" class="text-center">No checkup records found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Apply class based on visit_week (using existing logic)
+    const rows = document.querySelectorAll("tr");
+
+    rows.forEach((row) => {
+      const visitWeek = row.dataset.visitWeek;
+      if (visitWeek) {
+        if (visitWeek <= 16) {
+          row.classList.add("green");
+        } else if (visitWeek <= 32) {
+          row.classList.add("yellow");
+        } else {
+          row.classList.add("red");
+        }
+      }
+    });
+
+    // Confirm delete action
+    const deleteButtons = document.querySelectorAll('button[type="submit"]');
+    deleteButtons.forEach((button) => {
+      button.addEventListener("click", function (event) {
+        const confirmation = confirm(
+          "Are you sure you want to delete this record?"
+        );
+        if (!confirmation) {
+          event.preventDefault();
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

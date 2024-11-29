@@ -1,0 +1,101 @@
+{% extends 'base.html' %} {% block title %}Nepali(BS){% endblock %}
+<p>{% block content %}</p>
+<div class="mt-5">
+  <!-- Header Section -->
+  <div class="card-header text-center bg-primary text-white">
+    <h2><strong>Pregnancy Date Calculator</strong></h2>
+  </div>
+
+  <div class="card shadow-sm mt-4">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- LMP Date Input -->
+        <div class="form-group">
+          <label for="lmpDate"><strong>Enter the LMP Date (BS):</strong></label>
+          {{ form.lmp_date }}
+        </div>
+
+        <!-- Visit Date Input -->
+        <div class="form-group">
+          <label for="visitDate"
+            ><strong>Enter Today's Visit Date (BS):</strong></label
+          >
+          {{ form.visit_date }}
+        </div>
+
+        <!-- Calculate Button -->
+        <div class="text-center">
+          <button type="submit" class="btn btn-success btn-lg mt-4">
+            Calculate
+          </button>
+        </div>
+      </form>
+
+      <!-- Results Section -->
+      {% if gestational_age %}
+      <div class="mt-6 p-4 bg-light border border-primary rounded-md mt-5">
+        <h3 class="text-lg font-semibold text-primary mb-3">
+          Calculated Pregnancy Date:
+        </h3>
+
+        <!-- Displaying LMP, EDD, and Gestational Age -->
+        <div class="mb-2">
+          <strong>LMP (BS):</strong>
+          <p>{{ lmp_bs }} {{ lmp_weekday }}</p>
+        </div>
+        <div class="row">
+          <div class="col-6 col-md-6 mb-2">
+            <strong>EDD (BS):</strong> {{ due_date_bs }}
+          </div>
+          <div class="col-6 col-md-6 mb-2">
+            <strong>EDD (AD):</strong> {{ due_date }}
+          </div>
+        </div>
+
+        <p class="text-dark">
+          <strong>Gestational Age:</strong> {{ gestational_age }} <br />
+        </p>
+      </div>
+
+      {% else %}
+      <p class="text-center text-muted mt-4">
+        Please enter a valid Nepali date to calculate the gestational age.
+      </p>
+      {% endif %}
+    </div>
+    <script>
+      // Convert AD to BS (Nepali Date) - Placeholder function
+      function convertADtoBS(adDate) {
+        const monthsNepali = [
+          "बैशाख",
+          "जेष्ठ",
+          "आषाढ़",
+          "श्रावण",
+          "भाद्रपद",
+          "आश्विन",
+          "कात्तिक",
+          "मङ्सिर",
+          "पुष",
+          "माघ",
+          "फागुन",
+          "चैत",
+        ];
+        const date = new Date(adDate);
+        const nepaliMonth = monthsNepali[date.getMonth()];
+        const nepaliYear = date.getFullYear() + 57;
+        return `${nepaliYear} ${nepaliMonth} ${date.getDate()}`;
+      }
+
+      // Get today's date and display it in BS format
+      const today = new Date();
+      const nepaliDate = convertADtoBS(today);
+      document.getElementById(
+        "nepali-date"
+      ).innerText = `Today's Nepali Date: ${nepaliDate}`;
+    </script>
+
+    {% endblock %}
+  </div>
+</div>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+<p>{% load crispy_forms_tags %}</p>
+{% block content %}
+<div class="container">
+  <h1 class="title">
+    <span style="color: #28a745">Edit Profile</span>
+  </h1>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %} {{ form|crispy }}
+
+    <div class="form-group">
+      <label for="profile_image">Profile Image</label><br />
+      {% if profile.profile_image %}
+      <img
+        src="{{ profile.profile_image.url }}"
+        alt="Profile Image"
+        width="150"
+        height="150"
+      />
+      {% else %}
+      <p>No image uploaded</p>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+{% endblock %}

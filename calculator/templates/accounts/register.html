@@ -1,0 +1,286 @@
+{% extends 'base_login_register.html' %} {% load static %} {% block content %}
+
+<style>
+  /* General container styling */
+  .signup-container {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+
+  .card {
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Improved shadow for depth */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    width: 100%;
+    background-color: white;
+    margin: 20px;
+  }
+
+  .card-header {
+    background: #6a11cb;
+    color: white;
+    text-align: center;
+    padding: 40px;
+    font-size: 1.75rem;
+    font-weight: bold;
+    border-bottom: none;
+  }
+
+  .card-body {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-container {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .image-container img {
+    max-width: 50%;
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out; /* Smooth hover effect */
+  }
+
+  .image-container img:hover {
+    transform: scale(1.1); /* Enlarge image on hover */
+  }
+
+  /* Input styling */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 100%;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus {
+    border-color: #2575fc;
+    outline: none;
+  }
+
+  /* Button styling */
+  button[type="submit"] {
+    background-color: #2575fc;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #1a60c8;
+    transform: translateY(-3px);
+  }
+
+  /* Links */
+  a.text-info {
+    color: #6a11cb;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  a.text-info:hover {
+    text-decoration: underline;
+  }
+
+  /* Eye icon and password visibility */
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .password-container input {
+    padding-right: 40px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #2575fc;
+  }
+
+  /* Text styling */
+  .text-center p {
+    font-size: 1rem;
+    color: #444;
+  }
+
+  /* Desktop only styling - This will not affect mobile view */
+  @media (min-width: 769px) {
+    .signup-container {
+      padding: 50px; /* Add padding around the container */
+    }
+
+    .card {
+      margin: 40px auto;
+      padding: 40px;
+      max-width: 800px;
+    }
+
+    .card-header {
+      padding: 50px;
+      font-size: 2rem; /* Larger font size for better readability */
+    }
+
+    .card-body {
+      padding: 50px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    button[type="submit"] {
+      font-size: 1.2rem; /* Slightly larger text for better readability */
+    }
+  }
+
+  /* No changes made to the mobile view styles */
+  @media (max-width: 768px) {
+    .signup-container {
+      padding: 10px;
+    }
+
+    .card {
+      width: 100%;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    .image-container img {
+      max-width: 60%;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    button[type="submit"] {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="signup-container">
+  <div class="card">
+    <div class="card-header">
+      <h1>Join Us Today!</h1>
+      <p>Create an account to start your journey.</p>
+    </div>
+    <div class="card-body">
+      <div class="image-container">
+        <img src="{% static 'images/pragnancy.jpg' %}" alt="Welcome" />
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="form-control"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group password-container">
+          <input
+            type="password"
+            name="password1"
+            id="password1"
+            placeholder="Password"
+            class="form-control"
+            required
+          />
+          <i
+            class="fas fa-eye password-toggle"
+            id="togglePassword1"
+            onclick="togglePassword('password1', 'togglePassword1')"
+          ></i>
+        </div>
+
+        <div class="form-group password-container">
+          <input
+            type="password"
+            name="password2"
+            id="password2"
+            placeholder="Confirm Password"
+            class="form-control"
+            required
+          />
+          <i
+            class="fas fa-eye password-toggle"
+            id="togglePassword2"
+            onclick="togglePassword('password2', 'togglePassword2')"
+          ></i>
+        </div>
+
+        <button type="submit"><i class="fas fa-user-plus"></i> Sign Up</button>
+      </form>
+
+      <div class="text-center mt-3">
+        <p>
+          Already have an account?
+          <a href="{% url 'login' %}" class="text-info">Log In</a>
+        </p>
+        <p>
+          By signing up, you agree to our
+          <a href="#" class="text-info">Terms of Service</a> and
+          <a href="#" class="text-info">Privacy Policy</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassword(inputId, iconId) {
+    var passwordField = document.getElementById(inputId);
+    var toggleIcon = document.getElementById(iconId);
+
+    // Toggle the password field type
+    if (passwordField.type === "password") {
+      passwordField.type = "text"; // Change to text to show password
+      toggleIcon.classList.remove("fa-eye"); // Remove eye icon
+      toggleIcon.classList.add("fa-eye-slash"); // Add eye-slash icon
+    } else {
+      passwordField.type = "password"; // Change back to password to hide it
+      toggleIcon.classList.remove("fa-eye-slash"); // Remove eye-slash icon
+      toggleIcon.classList.add("fa-eye"); // Add eye icon
+    }
+  }
+</script>
+
+{% endblock %}

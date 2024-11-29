@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<title>Record Visit</title>
+<style>
+  body {
+    background-color: #f4f8fb;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  form label {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  button.btn-success {
+    padding: 10px 30px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+  }
+
+  button.btn-success:hover {
+    background-color: #28a745;
+    transform: translateY(-3px);
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+
+{% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class=" mt-5 py-4">
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-info text-white text-center">
+      <h2>Record Supplement Intake for {{ checkup.patient_name }}</h2>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+          {% csrf_token %}
+          <!-- Visit Week -->
+          <div class="form-group">
+            <label for="visit_week"><strong>Visit Week</strong></label>
+            <select id="visit_week" name="visit_week" class="form-control" required>
+                <option value="" disabled {% if next_visit_week is none %}selected{% endif %}>Select a Week</option>
+                
+                {% for week in weeks %}
+                    <option value="{{ week }}" {% if next_visit_week == week %}selected{% endif %}>Week {{ week }}</option>
+                {% endfor %}
+            </select>
+          </div>
+            <!-- Today's Visit Date (BS) -->
+          <div class="form-group">
+            <label for="visit_date_bs"><strong>Today's Visit Date (BS)</strong></label>
+            <input type="text" id="visit_date_bs" name="visit_date_bs" class="form-control" value="" placeholder="YYYY-MM-DD" required />
+          </div>
+
+          <!-- Next Visit Date (BS) -->
+          <div class="row"> 
+            <div class="form-group">
+              <label for="next_visit_date"><strong>Next Visit Date (BS)</strong></label>
+              <input type="text" id="next_visit_date" name="next_visit_date" class="form-control" value="" placeholder="YYYY-MM-DD" required />
+              <button type="submit" class="btn btn-success btn-lg mt-4">
+                Calculate
+              </button>
+            </div>
+            <!-- Iron Per Day -->
+            <!-- Iron Per Day -->
+            <div id="iron_per_day_group" class="form-group">
+              <label for="iron_per_day"><strong>Total Iron (Tab)</strong></label>
+              <input type="number" id="iron_per_day" name="iron_per_day" class="form-control" value="" min="0" step="0.1" required />
+            </div>
+            
+
+            <!-- Calcium Per Day -->
+            <div id="calcium_per_day_group" class="form-group">
+              <label for="calcium_per_day"><strong>Total Calcium (Tab)</strong></label>
+              <input type="number" id="calcium_per_day" name="calcium_per_day" class="form-control" value="" min="0" step="0.1" required />
+            </div>
+
+          </div>
+          <div class="form-group">
+            <label for="iron_intake"><strong>Iron Intake (Tab)</strong></label>
+            <input type="number" id="iron_intake" name="iron_intake" class="form-control" value="" min="0" step="1" required
+            />
+          </div>
+    
+          <!-- Calcium Intake -->
+          <div class="form-group">
+            <label for="calcium_intake"><strong>Calcium Intake (Tab)</strong></label>
+            <input type="number" id="calcium_intake" name="calcium_intake" class="form-control" value="" min="0" step="1" required
+            />
+          </div>
+            <div id="folic_acid_group" class="form-group">
+              <label for="folic_acid"><strong>Folic Acid Given?</strong></label>
+              <select id="folic_acid" name="folic_acid" class="form-control">
+                  <option value="">Select...</option>
+                  <option value="yes" {% if visit.folic_acid == 'yes' %}selected{% endif %}>Yes</option>
+                  <option value="no" {% if visit.folic_acid == 'no' %}selected{% endif %}>No</option>
+              </select>
+            </div>
+      
+          <!-- Td Injection Given Question -->
+          <div id="dt_injection_group" class="form-group">
+              <label for="dt_injection"><strong>Td Injection Given?</strong></label>
+              <select id="dt_injection" name="dt_injection" class="form-control">
+                  <option value="">Select...</option>
+                  <option value="yes" {% if visit.dt_injection == 'yes' %}selected{% endif %}>Yes</option>
+                  <option value="no" {% if visit.dt_injection == 'no' %}selected{% endif %}>No</option>
+              </select>
+          </div>
+      
+          <!-- Albendazole Given Question -->
+          <div class="form-group">
+            <label for="intestinal_parasites_medicine"><strong>Albendazole (400mg) Given?</strong></label>
+            <select id="intestinal_parasites_medicine" name="intestinal_parasites_medicine" class="form-control">
+              <option value="">Select...</option>
+                <option value="yes" {% if visit.intestinal_parasites_medicine == 'yes' %}selected{% endif %}>Yes</option>
+                <option value="no" {% if visit.intestinal_parasites_medicine == 'no' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+    
+          <button type="submit" class="btn btn-primary">Submit</button>
+          
+      </form> 
+      <div class="text-center bg-green">
+      <a href="{% url 'checkup_detail' checkup.id %}" class="btn btn-secondary">
+        View<i class="fas fa-arrow-right"></i>
+      </a>
+      </div>
+    
+    </div>
+      <script>
+          document.addEventListener('DOMContentLoaded', function () {
+              const totalIronDose = 180; // Total dose from week 12 to 38
+              const totalCalciumDose = 180; // Total dose for Calcium
+              const totalDays = 180; // Total days from Week 12 to Week 38 (26 weeks * 7 days)
+          
+              const dailyIronDose = totalIronDose / totalDays;
+              const dailyCalciumDose = totalCalciumDose / totalDays;
+          
+              const visitDateInput = document.getElementById("visit_date_bs");
+              const nextVisitDateInput = document.getElementById("next_visit_date");
+              const ironPerDayInput = document.getElementById("iron_per_day");
+              const calciumPerDayInput = document.getElementById("calcium_per_day");
+          
+              const visitWeekSelect = document.getElementById('visit_week');
+              const folicAcidGroup = document.getElementById('folic_acid_group');
+              const ironPerDayGroup = document.getElementById('iron_per_day_group');
+              const calciumPerDayGroup = document.getElementById('calcium_per_day_group');
+          
+              // Function to calculate iron and calcium doses
+              function calculateDoses() {
+                  const startDate = visitDateInput.value.trim();
+                  const endDate = nextVisitDateInput.value.trim();
+          
+                  // Check if both dates are entered
+                  if (!startDate || !endDate) {
+                      return; // Exit if either date is missing
+                  }
+          
+                  const start = new Date(startDate);
+                  const end = new Date(endDate);
+          
+                  // Check if the end date is after the start date
+                  if (end < start) {
+                      alert("End date must be after the start date.");
+                      return;
+                  }
+          
+                  // Calculate days between dates
+                  const daysBetween = Math.floor((end - start) / (1000 * 3600 * 24));
+                  const ironDose = daysBetween * dailyIronDose;
+                  const calciumDose = daysBetween * dailyCalciumDose;
+          
+                  // Display the calculated doses
+                  ironPerDayInput.value = Math.round(ironDose);
+                  calciumPerDayInput.value = Math.round(calciumDose);
+              }
+          
+              // Add event listeners to recalculate doses when dates change
+              
+              visitDateInput.addEventListener('change', calculateDoses);
+              nextVisitDateInput.addEventListener('change', calculateDoses);
+          
+              // --------------------- Folic Acid Section Visibility ---------------------
+              function checkVisitWeek() {
+                  const selectedWeek = parseInt(visitWeekSelect.value);
+          
+                  // Toggle visibility based on the selected week
+                  if (selectedWeek > 12) {
+                      folicAcidGroup.style.display = 'none';
+                  } else {
+                      folicAcidGroup.style.display = 'block';
+                  }
+          
+                  // Toggle Iron and Calcium fields based on the week
+                  if (selectedWeek < 12) {
+                      ironPerDayGroup.style.display = 'none';
+                      calciumPerDayGroup.style.display = 'none';
+                  } else {
+                      ironPerDayGroup.style.display = 'block';
+                      calciumPerDayGroup.style.display = 'block';
+                  }
+              }
+          
+              // Run the visibility check on page load and when the week changes
+              checkVisitWeek();
+              visitWeekSelect.addEventListener('change', checkVisitWeek);
+          
+              // ------------------- Intestinal Parasites Section Visibility -------------------
+              const intestinalParasitesMedicineSelect = document.getElementById('intestinal_parasites_medicine');
+              const intestinalParasitesGroup = document.getElementById('intestinal_parasites_group');
+          
+              function checkIntestinalParasitesMedicine() {
+                  const selectedValue = intestinalParasitesMedicineSelect.value;
+                  intestinalParasitesGroup.style.display = selectedValue === 'yes' ? 'none' : 'block';
+              }
+          
+              checkIntestinalParasitesMedicine();
+              intestinalParasitesMedicineSelect.addEventListener('change', checkIntestinalParasitesMedicine);
+          
+              // ------------------- DT Injection Section Visibility -------------------
+              const dtInjectionSelect = document.getElementById('dt_injection');
+              const dtInjectionGroup = document.getElementById('dt_injection_group');
+              let yesCount = 0;
+          
+              function checkDtInjectionCount() {
+                  if (yesCount >= 2) {
+                      dtInjectionGroup.style.display = 'none';
+                  }
+              }
+          
+              dtInjectionSelect.addEventListener('change', function () {
+                  if (dtInjectionSelect.value === 'yes') {
+                      yesCount += 1;
+                  }
+                  checkDtInjectionCount();
+              });
+          
+              checkDtInjectionCount();
+          });
+      </script>
+    </div>
+    </div>
+  </div>
+</div> 
+
+
+{% endblock %}
