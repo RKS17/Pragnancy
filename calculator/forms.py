@@ -59,7 +59,7 @@ class PregnancyCheckupForm(forms.ModelForm):
             'patient_name': 'महिलाको नाम',
             'husband_name': 'पतिको नाम',
             'contact_number': 'संपर्क नम्बर',
-            'last_menstrual_period_bs': 'अन्तिम महिनावारी (BS)',
+            'last_menstrual_period_bs': 'अन्तिम महिनावारी (YYYY-MM-DD)',
             'lmp_date': forms.DateInput(attrs={'type': 'date'}),
             'iron_per_day': forms.NumberInput(attrs={'step': '0.1'}),
             'calcium_per_day': forms.NumberInput(attrs={'step': '0.1'}),

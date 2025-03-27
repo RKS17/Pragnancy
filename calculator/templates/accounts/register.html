@@ -3,12 +3,13 @@
 <style>
   /* General container styling */
   .signup-container {
-    margin-top: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 80vh; /* Allow container to grow if content overflows */
     background: linear-gradient(to right, #6a11cb, #2575fc);
+    padding: 20px; /* Add padding for smaller screens */
+    box-sizing: border-box; /* Ensure padding doesn’t cause overflow */
   }
 
   .card {
@@ -42,12 +43,13 @@
 
   .image-container {
     text-align: center;
-    margin-bottom: 30px;
+    margin-top: 10px;
+    margin-bottom: 0px;
   }
 
   .image-container img {
-    max-width: 50%;
-    border-radius: 50%;
+    max-width: 40%;
+    border-radius: 60%;
     transition: transform 0.3s ease-in-out; /* Smooth hover effect */
   }
 
@@ -182,18 +184,49 @@
       font-size: 1rem;
     }
   }
+  .alert-container {
+    margin: 20px auto;
+    max-width: 800px;
+  }
+
+  .alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
 </style>
 
 <div class="signup-container">
   <div class="card">
     <div class="card-header">
-      <h1>Join Us Today!</h1>
-      <p>Create an account to start your journey.</p>
+      <h1>Welcome to Pregnancy Care</h1>
     </div>
     <div class="card-body">
       <div class="image-container">
-        <img src="{% static 'images/pragnancy.jpg' %}" alt="Welcome" />
+        <img src="{% static 'images/background.jpg' %}" alt="Welcome" />
       </div>
+      {% if messages %}
+      <div class="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <form method="POST">
         {% csrf_token %}
         <div class="form-group">

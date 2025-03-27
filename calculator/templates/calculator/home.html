@@ -163,6 +163,13 @@
 <section class="hero text-center bg-image-with-overlay">
   <div class="overlay"></div>
   <div class="container py-5 text-white">
+    {% if messages %}
+    <div class="alert alert-success">
+      {% for message in messages %}
+      <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
     <h2>Welcome to Pregnancy Care</h2>
     <p><strong>"Care for Mothers, Hope for Children."</strong></p>
   </div>

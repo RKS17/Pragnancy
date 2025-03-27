@@ -1,63 +1,55 @@
-
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.forms import PasswordResetForm
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfile
-from django.contrib.auth import logout
-from datetime import datetime
-from django.utils.timezone import make_aware
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib import messages
-
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from datetime import timedelta, datetime
-from django.shortcuts import get_object_or_404, render, redirect
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-import nepali_datetime  # Assuming this is a custom module for BS-AD conversion
-from datetime import timedelta
-from django.utils import timezone
-from datetime import datetime
-from .models import PregnancyCheckup, CheckupVisit
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import *
-from .models import *
-from datetime import datetime, timedelta
-import nepali_datetime
-from django.shortcuts import render, redirect
-from .forms import UserProfileForm
+from django.contrib.auth.forms import PasswordResetForm, UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils.timezone import make_aware
+from django.utils import timezone
+from datetime import datetime, timedelta
+import nepali_datetime  # Assuming this is for BS-AD conversion
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfile
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfile
-from django.contrib.auth import update_session_auth_hash
+from .models import *
+from .forms import *
 
 
 def register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, 'Your account has been created. You can now log in.')
-            return redirect('login')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'accounts/register.html', {'form': form})
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        # Check if passwords match
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+            return redirect('register')
+
+        # Check if username or email already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken.")
+            return redirect('register')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered.")
+            return redirect('register')
+
+        # If no errors, create the user
+        user = User.objects.create_user(
+            username=username, email=email, password=password1)
+        user.save()
+        messages.success(
+            request, "Your account has been created successfully!")
+        return redirect('login')
+
+    return render(request, 'accounts/register.html')
 
 
 def user_login(request):
@@ -66,11 +58,15 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Redirect to home page after successful login
-
-            return redirect('home')
+            # Add a welcome message
+            messages.success(request, f"Welcome, {user.username}!")
+            return redirect('home')  # Redirect to home page
+        else:
+            # Add error message for invalid credentials
+            messages.error(request, "Invalid username or password.")
     else:
         form = AuthenticationForm()
+
     return render(request, 'accounts/login.html', {'form': form})
 
 
@@ -126,30 +122,32 @@ def change_password(request):
     return render(request, 'accounts/change_password.html', {'form': form})
 
 
-def reset_password(request):
-    if request.method == "POST":
-        # Use the built-in PasswordResetForm
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            # Save the form and send the password reset email
-            form.save(
-                request=request,
-                use_https=request.is_secure(),
-                from_email=None,  # You can specify a custom sender email here
-                # Your custom email template
-                email_template_name='accounts/password_reset_email.html',
-            )
-            messages.success(request, "Password reset email has been sent.")
-            # Redirect to the login page after successful reset request
-            return redirect('login')
-    else:
-        form = PasswordResetForm()  # Initialize the form for GET request
+# def reset_password(request):
+#     if request.method == "POST":
+#         # Use the built-in PasswordResetForm
+#         form = PasswordResetForm(request.POST)
+#         if form.is_valid():
+#             # Save the form and send the password reset email
+#             form.save(
+#                 request=request,
+#                 use_https=request.is_secure(),
+#                 from_email=None,  # You can specify a custom sender email here
+#                 email_template_name='accounts/password_reset_email.html',
+#             )
+#             messages.success(request, "Password reset email has been sent.")
+#             # Redirect to the login page after successful reset request
+#             return redirect('login')
+#         else:
+#             # If the form is not valid, show an error message
+#             messages.error(request, "Please enter a valid email address.")
+#     else:
+#         form = PasswordResetForm()  # Initialize the form for GET request
 
-    return render(request, 'accounts/password_reset.html', {'form': form})
+#     return render(request, 'accounts/password_reset.html', {'form': form})
 
 
-def password_reset_done(request):
-    return render(request, 'accounts/password_reset_done.html',)
+# def password_reset_done(request):
+#     return render(request, 'accounts/password_reset_done.html',)
 
 
 @login_required
@@ -266,29 +264,22 @@ def add_pregnancy_checkup(request):
     if request.method == 'POST':
         form = PregnancyCheckupForm(request.POST)
         if form.is_valid():
-            # Get the form data without saving it to the database yet
             checkup = form.save(commit=False)
-
-            # Assign the current logged-in user to the checkup record
             checkup.user = request.user
-
-            # If the arrival_date is not provided, use today's date in Nepali (BS)
             if not checkup.arrival_date:
-                # This assumes you're using a custom date conversion
-                nepali_date = datetime.now().date()
-                checkup.arrival_date = str(nepali_date)
-
-            # Convert Nepali date to AD date (if applicable)
+                # Get today's date in Nepali BS format
+                nepali_date = nepali_datetime.now().date()
+                # Store it as a string in the correct format
+                checkup.arrival_date = nepali_date.strftime('%Y-%m-%d')
             try:
-                nepali_date_bs = datetime.strptime(
+                nepali_date_bs = nepali_datetime.strptime(
                     checkup.arrival_date, "%Y-%m-%d")
-                # Assuming you have a function to convert BS to AD
-                ad_date = nepali_date_bs.to_datetime_date()  # Convert to AD date if needed
-                checkup.ad_arrival_date = ad_date.strftime("%Y-%m-%d")
-            except Exception as e:
-                print("Error in converting Nepali date to AD:", e)
+                ad_date = nepali_date_bs.to_ad()
+                checkup.ad_arrival_date = ad_date.strftime(
+                    "%Y-%m-%d")
 
-            # Save the checkup with the user assigned
+            except Exception as e:
+                print(f"Error in converting Nepali date to AD: {e}")
             checkup.save()
             return redirect('checkup_list')
     else:

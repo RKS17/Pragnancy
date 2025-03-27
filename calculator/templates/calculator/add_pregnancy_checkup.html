@@ -1,7 +1,6 @@
 {% extends 'base.html' %} {% load widget_tweaks %} {% block content %}
 <title>ADD Patient</title>
 <style>
-  /* Add this in your styles.css */
   body {
     background-color: #f7f9fc;
   }
@@ -28,6 +27,12 @@
     border-radius: 5px;
   }
 
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }
+
   button.btn-success {
     padding: 10px 30px;
     border-radius: 30px;
@@ -40,6 +45,7 @@
     transform: translateY(-2px);
   }
 </style>
+
 <div class="mt-5">
   <div class="card shadow-lg border-0 rounded-lg">
     <!-- Card Header with Title -->
@@ -55,46 +61,56 @@
           <div class="form-row">
             <!-- Patient Name Field -->
             <div class="form-group col-md-6">
-              <label for="patientName" class="font-weight-bold">
+              <label for="id_patient_name" class="font-weight-bold">
                 {{ form.patient_name.label }}
               </label>
               {{ form.patient_name|add_class:"form-control" }}
+              <p>{% if form.patient_name.errors %}</p>
+              <div class="error-message">
+                {{ form.patient_name.errors|join:", " }}
+              </div>
+              {% endif %}
             </div>
 
             <!-- Husband Name Field -->
             <div class="form-group col-md-6">
-              <label for="husbandName" class="font-weight-bold">
+              <label for="id_husband_name" class="font-weight-bold">
                 {{ form.husband_name.label }}
               </label>
               {{ form.husband_name|add_class:"form-control" }}
+              <p>{% if form.husband_name.errors %}</p>
+              <div class="error-message">
+                {{ form.husband_name.errors|join:", " }}
+              </div>
+              {% endif %}
             </div>
           </div>
 
           <div class="form-row">
             <!-- Contact Number Field -->
             <div class="form-group col-md-6">
-              <label for="contactNumber" class="font-weight-bold">
+              <label for="id_contact_number" class="font-weight-bold">
                 {{ form.contact_number.label }}
               </label>
               {{ form.contact_number|add_class:"form-control" }}
+              <p>{% if form.contact_number.errors %}</p>
+              <div class="error-message">
+                {{ form.contact_number.errors|join:", " }}
+              </div>
+              {% endif %}
             </div>
 
             <!-- Last Menstrual Period (BS) Field -->
             <div class="form-group col-md-6">
-              <label for="lmpBS" class="font-weight-bold">
+              <label for="id_last_menstrual_period_bs" class="font-weight-bold">
                 {{ form.last_menstrual_period_bs.label }}
               </label>
               {{ form.last_menstrual_period_bs|add_class:"form-control" }}
-            </div>
-          </div>
-
-          <div class="form-row">
-            <!-- Profile Image Upload Field (Optional) -->
-            <div class="form-group col-md-6">
-              <label for="profileImage" class="font-weight-bold">
-                {{ form.profile_image.label }}
-              </label>
-              {{ form.profile_image|add_class:"form-control-file" }}
+              <p>{% if form.last_menstrual_period_bs.errors %}</p>
+              <div class="error-message">
+                {{ form.last_menstrual_period_bs.errors|join:", " }}
+              </div>
+              {% endif %}
             </div>
           </div>
 
@@ -107,7 +123,6 @@
         </form>
       </div>
     </div>
-    </div>
   </div>
-  {% endblock %}
 </div>
+{% endblock %}
